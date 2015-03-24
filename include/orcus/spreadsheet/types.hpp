@@ -188,6 +188,39 @@ enum databar_axis_t
     databar_axis_automatic
 };
 
+enum table_style_element_t
+{
+    table_style_element_dont_know = 0,
+    table_style_element_blank_row,
+    table_style_element_first_column,
+    table_style_element_first_column_stripe,
+    table_style_element_first_column_subheading,
+    table_style_element_first_header_cell,
+    table_style_element_first_row_stripe,
+    table_style_element_first_row_subheading,
+    table_style_element_first_subtotal_column,
+    table_style_element_first_subtotal_row,
+    table_style_element_first_total_cell,
+    table_style_element_header_row,
+    table_style_element_last_column,
+    table_style_element_last_header_cell,
+    table_style_element_last_total_cell,
+    table_style_element_page_field_labels,
+    table_style_element_page_field_values,
+    table_style_element_second_column_stripe,
+    table_style_element_second_column_subheading,
+    table_style_element_second_row_stripe,
+    table_style_element_second_row_subheading,
+    table_style_element_second_subtotal_column,
+    table_style_element_second_subtotal_row,
+    table_style_element_third_column_subheading,
+    table_style_element_third_row_subtotal,
+    table_style_element_third_subtotal_column,
+    table_style_element_third_subtotal_row,
+    table_style_element_total_row,
+    table_style_element_whole_table
+};
+
 /**
  * Convert a string representation of a totals row function name to its
  * equivalent enum value.

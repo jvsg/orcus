@@ -405,6 +405,57 @@ public:
     virtual void commit() = 0;
 };
 
+class ORCUS_DLLPUBLIC import_table_style
+{
+public:
+    virtual ~import_table_style() = 0;
+
+    /**
+     * A zero based index into the dxf entries.
+     */
+    virtual void set_dxf_id(size_t id) = 0;
+
+    /**
+     * The size of a band of rows or columns.
+     *
+     * Only valid if type is first_row_stripe, second_row_stripe,
+     * first_column_stripe or second_column_stripe.
+     */
+    virtual void set_band_size(size_t n) = 0;
+
+    /**
+     * Defines the type of this style element.
+     *
+     * The valid values depend on the style being a table style or
+     * a pivot table style.
+     */
+    virtual void set_element_type(orcus::spreadsheet::table_style_element_t type) = 0;
+
+    virtual void commit_element() = 0;
+
+    virtual void set_style_element_count(size_t n) = 0;
+
+    virtual void set_name(const char* p, size_t n) = 0;
+
+    /**
+     * Whether to treat this style as a pivot table style.
+     */
+    virtual void set_pivot_style(bool b) = 0;
+
+    /**
+     * Whether tp treat this style as a normal table style.
+     */
+    virtual void set_table_style(bool b) = 0;
+
+    virtual void commit_table_style() = 0;
+
+    virtual void set_table_style_count(size_t n) = 0;
+
+    virtual void set_default_table_style(const char* p, size_t n) = 0;
+
+    virtual void set_default_pivot_style(const char* p, size_t n) = 0;
+};
+
 /**
  * Interface for sheet.
  */
@@ -696,6 +747,12 @@ public:
      *         client app doesn't support styles.
      */
     virtual import_styles* get_styles();
+
+    /**
+     * @return pointer to the table style instance. It may return NULL if the
+     *          client app doesn't support table styles.
+     */
+    virtual import_table_style* get_table_style();
 
     /**
      * @return pointer to the sheet instance. It may return NULL if the client
