@@ -1,0 +1,59 @@
+/* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef ORCUS_XLSX_CONTEXT_HPP
+#define ORCUS_XLSX_CONTEXT_HPP
+
+#include "orcus/spreadsheet/types.hpp"
+#include "orcus/string_pool.hpp"
+
+#include "xml_context_base.hpp"
+#include "xlsx_types.hpp"
+
+#include <boost/ptr_container/ptr_vector.hpp>
+
+namespace orcus {
+
+namespace spreadsheet { namespace iface {
+    class import_sheet;
+    class import_shared_strings;
+    class import_styles;
+    class import_table_style;
+}}
+
+typedef std::map<size_t, size_t> dxf_id_map;
+
+class xlsx_table_styles_context : public xml_context_base
+{
+public:
+    xlsx_table_styles_context(session_context& session_cxt, const tokens& tokens,
+            spreadsheet::iface::import_table_style* import_table_styles);
+    virtual ~xlsx_table_styles_context();
+
+    virtual bool can_handle_element(xmlns_id_t ns, xml_token_t name) const;
+    virtual xml_context_base* create_child_context(xmlns_id_t ns, xml_token_t name);
+    virtual void end_child_context(xmlns_id_t ns, xml_token_t name, xml_context_base* child);
+
+    virtual void start_element(xmlns_id_t ns, xml_token_t name, const xml_attrs_t& attrs);
+    virtual bool end_element(xmlns_id_t ns, xml_token_t name);
+    virtual void characters(const pstring& str, bool transient);
+
+private:
+    spreadsheet::iface::import_table_style* m_table_styles;
+    string_pool m_pool;
+    /**
+     * Only necessary for the presetTableStyles to translate between
+     * local dxf ids and the global ones returned by the application
+     */
+    dxf_id_map m_local_to_global_dxf;
+};
+
+}
+
+#endif
+
+/* vim:set shiftwidth=4 softtabstop=4 expandtab: */

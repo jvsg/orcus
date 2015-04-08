@@ -482,11 +482,19 @@ xlsx_styles_context::~xlsx_styles_context() {}
 
 bool xlsx_styles_context::can_handle_element(xmlns_id_t ns, xml_token_t name) const
 {
+    if (ns == NS_ooxml_xlsx && name == XML_tableStyles)
+        return false;
+        
     return true;
 }
 
 xml_context_base* xlsx_styles_context::create_child_context(xmlns_id_t ns, xml_token_t name)
 {
+    if (ns == NS_ooxml_xlsx && name == XML_tableStyles)
+    {
+        //return new xlsx_table_style_context();
+    }
+
     return NULL;
 }
 
@@ -788,6 +796,12 @@ void xlsx_styles_context::start_element(xmlns_id_t ns, xml_token_t name, const x
             expected_elements.push_back(xml_token_pair_t(NS_ooxml_xlsx, XML_dxf));
             xml_element_expected(parent, expected_elements);
         }
+        break;
+        case XML_tableStyles:
+        break;
+        case XML_tableStyle:
+        break;
+        case XML_tableStyleElement:
         break;
         default:
             warn_unhandled();

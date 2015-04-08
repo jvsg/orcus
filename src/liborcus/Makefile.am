@@ -111,6 +111,8 @@ liborcus_@ORCUS_API_VERSION@_la_SOURCES += \
 	xlsx_sheet_context.hpp \
 	xlsx_conditional_format_context.cpp \
 	xlsx_conditional_format_context.hpp \
+	xlsx_table_style_context.hpp \
+	xlsx_table_style_context.cpp \
 	xlsx_table_context.cpp \
 	xlsx_table_context.hpp \
 	xlsx_autofilter_context.cpp \
