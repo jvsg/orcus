@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef ORCUS_XLSX_CONTEXT_HPP
-#define ORCUS_XLSX_CONTEXT_HPP
+#ifndef ORCUS_XLSX_TABLE_STYLES_CONTEXT_HPP
+#define ORCUS_XLSX_TABLE_STYLES_CONTEXT_HPP
 
 #include "orcus/spreadsheet/types.hpp"
 #include "orcus/string_pool.hpp"

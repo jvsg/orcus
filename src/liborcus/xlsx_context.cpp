@@ -12,6 +12,7 @@
 #include "ooxml_types.hpp"
 #include "ooxml_schemas.hpp"
 #include "xlsx_helper.hpp"
+#include "xlsx_table_style_context.hpp"
 #include "xml_context_global.hpp"
 
 #include "orcus/global.hpp"
@@ -492,7 +493,12 @@ xml_context_base* xlsx_styles_context::create_child_context(xmlns_id_t ns, xml_t
 {
     if (ns == NS_ooxml_xlsx && name == XML_tableStyles)
     {
-        //return new xlsx_table_style_context();
+        if (mp_styles->get_table_style())
+        {
+            mp_child.reset(new xlsx_table_styles_context(get_session_context(), get_tokens(), mp_styles->get_table_style()));
+            mp_child->transfer_common(*this);
+            return mp_child.get();
+        }
     }
 
     return NULL;

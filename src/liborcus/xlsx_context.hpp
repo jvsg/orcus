@@ -15,6 +15,7 @@
 #include "xlsx_types.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace orcus {
 
@@ -71,6 +72,7 @@ private:
     void start_font_color(const xml_attrs_t& attrs);
 
 private:
+    boost::scoped_ptr<xml_context_base> mp_child;
     spreadsheet::iface::import_styles* mp_styles;
     string_pool m_pool;
     spreadsheet::border_direction_t m_cur_border_dir;
