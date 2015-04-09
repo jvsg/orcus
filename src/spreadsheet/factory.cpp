@@ -53,11 +53,6 @@ iface::import_styles* import_factory::get_styles()
     return mp_impl->m_doc.get_styles();
 }
 
-iface::import_table_style* import_factory::get_table_style()
-{
-    return NULL;
-}
-
 iface::import_sheet* import_factory::append_sheet(const char* sheet_name, size_t sheet_name_length)
 {
     return mp_impl->m_doc.append_sheet(

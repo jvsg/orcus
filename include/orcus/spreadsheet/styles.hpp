@@ -136,6 +136,8 @@ public:
     import_styles(string_pool& sp);
     virtual ~import_styles();
 
+    virtual iface::import_table_style* get_table_style();
+
     virtual void set_font_count(size_t n);
     virtual void set_font_bold(bool b);
     virtual void set_font_italic(bool b);

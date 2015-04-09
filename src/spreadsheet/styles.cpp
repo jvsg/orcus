@@ -126,6 +126,11 @@ import_styles::~import_styles()
 {
 }
 
+iface::import_table_style* import_styles::get_table_style()
+{
+    return NULL;
+}
+
 void import_styles::set_font_count(size_t n)
 {
     m_fonts.reserve(n);

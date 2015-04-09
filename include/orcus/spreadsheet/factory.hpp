@@ -27,7 +27,6 @@ public:
     virtual iface::import_global_settings* get_global_settings();
     virtual iface::import_shared_strings* get_shared_strings();
     virtual iface::import_styles* get_styles();
-    virtual iface::import_table_style* get_table_style();
     virtual iface::import_sheet* append_sheet(const char* sheet_name, size_t sheet_name_length);
     virtual iface::import_sheet* get_sheet(const char* sheet_name, size_t sheet_name_length);
     virtual iface::import_sheet* get_sheet(sheet_t sheet_index);

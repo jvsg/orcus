@@ -75,11 +75,6 @@ import_styles* import_factory::get_styles()
     return NULL;
 }
 
-import_table_style* import_factory::get_table_style()
-{
-    return NULL;
-}
-
 export_sheet::~export_sheet() {}
 
 export_factory::~export_factory() {}
