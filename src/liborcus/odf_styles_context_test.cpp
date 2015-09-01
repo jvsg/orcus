@@ -24,6 +24,15 @@ const orcus::spreadsheet::cell_style_t* find_cell_style_by_name(const orcus::pst
     return NULL;
 }
 
+void check_border(const orcus::spreadsheet::border_attrs_t& border, orcus::spreadsheet::color_elem_t red,
+        orcus::spreadsheet::color_elem_t green, orcus::spreadsheet::color_elem_t blue, orcus::spreadsheet::color_elem_t alpha)
+{
+    assert(border.border_color.red == red);
+    assert(border.border_color.green == green);
+    assert(border.border_color.blue == blue);
+    assert(border.border_color.alpha == alpha);
+}
+
 }
 
 int main()
@@ -49,5 +58,18 @@ int main()
     assert(cell_fill->bg_color.red == 0xfe);
     assert(cell_fill->bg_color.green == 0xff);
     assert(cell_fill->bg_color.blue == 0xcc);
+
+    size_t border = cell_format->border;
+    std::cerr << border << std::endl;
+    const orcus::spreadsheet::border_t* cell_border = styles.get_border(border);
+    assert(cell_border);
+    const orcus::spreadsheet::border_attrs_t& top = cell_border->top;
+    check_border(top, 0x12, 0xea, 0x4b, 0);
+    const orcus::spreadsheet::border_attrs_t& bottom = cell_border->bottom;
+    check_border(bottom, 0x12, 0xea, 0x4b, 0);
+    const orcus::spreadsheet::border_attrs_t& right = cell_border->right;
+    check_border(right, 0x12, 0xea, 0x4b, 0);
+    const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
+    check_border(left, 0x12, 0xea, 0x4b, 0);
     return 0;
 }
