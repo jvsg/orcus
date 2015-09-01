@@ -7,6 +7,13 @@
 
 #include "odf_helper.hpp"
 
+#include "string_helper.hpp"
+
+#include <mdds/sorted_string_map.hpp>
+#include <mdds/global.hpp>
+
+#include <orcus/global.hpp>
+
 namespace orcus {
 
 namespace {
@@ -46,6 +53,54 @@ bool convert_color_digits(const pstring& value, orcus::spreadsheet::color_elem_t
     return is_valid_hex_digit(low_val, color_val);
 }
 
+namespace {
+
+typedef mdds::sorted_string_map<odf_helper::border_properties::odf_border_style_t> odf_border_style_map;
+
+odf_border_style_map::entry odf_border_style_entries[] =
+{
+    {MDDS_ASCII("dashed"), odf_helper::border_properties::odf_border_style_t::dashed},
+    {MDDS_ASCII("dotted"), odf_helper::border_properties::odf_border_style_t::dotted},
+    {MDDS_ASCII("double"), odf_helper::border_properties::odf_border_style_t::double_border},
+    {MDDS_ASCII("groove"), odf_helper::border_properties::odf_border_style_t::groove},
+    {MDDS_ASCII("hidden"), odf_helper::border_properties::odf_border_style_t::hidden},
+    {MDDS_ASCII("inset"), odf_helper::border_properties::odf_border_style_t::inset},
+    {MDDS_ASCII("none"), odf_helper::border_properties::odf_border_style_t::none},
+    {MDDS_ASCII("outset"), odf_helper::border_properties::odf_border_style_t::outset},
+    {MDDS_ASCII("ridge"), odf_helper::border_properties::odf_border_style_t::ridge},
+    {MDDS_ASCII("solid"), odf_helper::border_properties::odf_border_style_t::solid}
+};
+
+}
+
+void parse_border_property(const pstring& property, odf_helper::border_properties& border_properties)
+{
+    if (property.empty())
+        return;
+
+    size_t prop_size = property.size();
+    if (prop_size == 7 && property[0] == '#')
+    {
+        // color property
+        border_properties.color_set = odf_helper::convert_fo_color(property,
+                border_properties.red, border_properties.green,
+                border_properties.blue);
+    }
+    else if (property[0] >= '0' && property[0] <= '9')
+    {
+        // border width
+        border_properties.width_set = true;
+        border_properties.width = orcus::to_length(property);
+    }
+    else
+    {
+        // assume it is the style
+        border_properties.style_set = true;
+        odf_border_style_map border_style_map(odf_border_style_entries, ORCUS_N_ELEMENTS(odf_border_style_entries), odf_helper::border_properties::odf_border_style_t::none);
+        border_properties.border_style = border_style_map.find(property.get(), property.size());
+    }
+}
+
 }
 
 bool odf_helper::convert_fo_color(const pstring& value, orcus::spreadsheet::color_elem_t& red,
@@ -65,6 +120,18 @@ bool odf_helper::convert_fo_color(const pstring& value, orcus::spreadsheet::colo
         return false;
 
     return convert_color_digits(value, blue, 5);
+}
+
+odf_helper::border_properties odf_helper::read_border_properties(const orcus::pstring& value)
+{
+    odf_helper::border_properties border_properties;
+
+    std::vector<pstring> split_properties = string_helper::split_string(value, ' ');
+
+    for (const pstring& property : split_properties)
+        parse_border_property(property, border_properties);
+
+    return border_properties;
 }
         
 }

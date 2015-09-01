@@ -10,14 +10,51 @@
 
 #include <orcus/pstring.hpp>
 #include <orcus/spreadsheet/types.hpp>
+#include <orcus/measurement.hpp>
 
 namespace orcus {
 
 class odf_helper
 {
+
+public:
+    struct border_properties
+    {
+        enum class odf_border_style_t
+        {
+            none,
+            hidden,
+            dotted,
+            dashed,
+            solid,
+            double_border,
+            groove,
+            ridge,
+            inset,
+            outset
+        };
+
+        spreadsheet::color_elem_t red;
+        spreadsheet::color_elem_t green;
+        spreadsheet::color_elem_t blue;
+
+        bool color_set;
+
+        odf_border_style_t border_style;
+        bool style_set;
+
+        length_t width;
+        bool width_set;
+
+        border_properties():
+            color_set(false), style_set(false), width_set(false) {}
+    };
+
 public:
     static bool convert_fo_color(const orcus::pstring& value, orcus::spreadsheet::color_elem_t& red,
             orcus::spreadsheet::color_elem_t& green, orcus::spreadsheet::color_elem_t& blue);
+
+    static border_properties read_border_properties(const orcus::pstring& value);
 
 };
 
