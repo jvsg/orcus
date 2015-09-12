@@ -33,17 +33,8 @@ void check_border(const orcus::spreadsheet::border_attrs_t& border, orcus::sprea
     assert(border.border_color.alpha == alpha);
 }
 
-}
-
-int main()
+void note_style_test(orcus::spreadsheet::import_styles& styles)
 {
-    orcus::string_pool string_pool;
-    const char* path = SRCDIR"/test/ods/styles/cell-styles.xml";
-    std::string content = orcus::load_file_content(path);
-    orcus::spreadsheet::import_styles styles(string_pool);
-    orcus::import_ods::read_styles(content.c_str(), content.size(), &styles);
-
-
     const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("Note", &styles);
     assert(style->parent_name == "Text");
     size_t xf = style->xf;
@@ -71,5 +62,72 @@ int main()
     check_border(right, 0x12, 0xea, 0x4b, 0);
     const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
     check_border(left, 0x12, 0xea, 0x4b, 0);
+}
+
+void border_right_test(orcus::spreadsheet::import_styles& styles)
+{
+    const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("border-right", &styles);
+    assert(style->parent_name == "Note");
+    size_t xf = style->xf;
+    std::cerr << std::hex << (int)xf;
+    const orcus::spreadsheet::cell_format_t* cell_format = styles.get_cell_style_format(xf);
+    assert(cell_format);
+
+    size_t border = cell_format->border;
+    const orcus::spreadsheet::border_t* cell_border = styles.get_border(border);
+    assert(cell_border);
+    const orcus::spreadsheet::border_attrs_t& right = cell_border->right;
+    check_border(right, 0x00, 0x00, 0x00, 0);
+}
+
+void border_left_test(orcus::spreadsheet::import_styles& styles)
+{
+    const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("border-left", &styles);
+    assert(style->parent_name == "Note");
+    size_t xf = style->xf;
+    std::cerr << std::hex << (int)xf;
+    const orcus::spreadsheet::cell_format_t* cell_format = styles.get_cell_style_format(xf);
+    assert(cell_format);
+
+    size_t border = cell_format->border;
+    const orcus::spreadsheet::border_t* cell_border = styles.get_border(border);
+    assert(cell_border);
+    const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
+    check_border(left, 0x00, 0x00, 0x00, 0);
+}
+
+void border_top_bottom_test(orcus::spreadsheet::import_styles& styles)
+{
+    const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("border-top-bottom", &styles);
+    assert(style->parent_name == "Note");
+    size_t xf = style->xf;
+    std::cerr << std::hex << (int)xf;
+    const orcus::spreadsheet::cell_format_t* cell_format = styles.get_cell_style_format(xf);
+    assert(cell_format);
+
+    size_t border = cell_format->border;
+    const orcus::spreadsheet::border_t* cell_border = styles.get_border(border);
+    assert(cell_border);
+    const orcus::spreadsheet::border_attrs_t& top = cell_border->top;
+    check_border(top, 0x00, 0x00, 0x00, 0);
+    const orcus::spreadsheet::border_attrs_t& bottom = cell_border->bottom;
+    check_border(bottom, 0x00, 0x00, 0x00, 0);
+}
+
+}
+
+int main()
+{
+    orcus::string_pool string_pool;
+    const char* path = SRCDIR"/test/ods/styles/cell-styles.xml";
+    std::string content = orcus::load_file_content(path);
+    orcus::spreadsheet::import_styles styles(string_pool);
+    orcus::import_ods::read_styles(content.c_str(), content.size(), &styles);
+
+    note_style_test(styles);
+    border_right_test(styles);
+    border_left_test(styles);
+    border_top_bottom_test(styles);
+
     return 0;
 }

@@ -3,4 +3,13 @@
   <style:style style:name="Note" style:family="table-cell" style:parent-style-name="Text">
     <style:table-cell-properties fo:background-color="#feffcc" fo:border="0.06pt solid #12ea4b"/>
   </style:style>
+  <style:style style:name="border-right" style:family="table-cell" style:parent-style-name="Note">
+      <style:table-cell-properties fo:border-bottom="none" fo:border-left="none" fo:border-right="0.06pt solid #000000" fo:border-top="none"/>
+  </style:style>
+  <style:style style:name="border-left" style:family="table-cell" style:parent-style-name="Note">
+      <style:table-cell-properties fo:border-bottom="none" fo:border-left="0.06pt solid #000000" fo:border-right="none" fo:border-top="none"/>
+  </style:style>
+  <style:style style:name="border-top-bottom" style:family="table-cell" style:parent-style-name="Note">
+      <style:table-cell-properties fo:border-bottom="0.06pt solid #000000" fo:border-left="none" fo:border-right="none" fo:border-top="0.06pt solid #000000"/>
+  </style:style>
 </office:styles>
