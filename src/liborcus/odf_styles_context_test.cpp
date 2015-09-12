@@ -33,6 +33,11 @@ void check_border(const orcus::spreadsheet::border_attrs_t& border, orcus::sprea
     assert(border.border_color.alpha == alpha);
 }
 
+void assert_border_not_set(const orcus::spreadsheet::border_attrs_t& border)
+{
+    assert(border.style == orcus::spreadsheet::border_style_t::none);
+}
+
 void note_style_test(orcus::spreadsheet::import_styles& styles)
 {
     const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("Note", &styles);
@@ -78,6 +83,12 @@ void border_right_test(orcus::spreadsheet::import_styles& styles)
     assert(cell_border);
     const orcus::spreadsheet::border_attrs_t& right = cell_border->right;
     check_border(right, 0x00, 0x00, 0x00, 0);
+    const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
+    assert_border_not_set(left);
+    const orcus::spreadsheet::border_attrs_t& top = cell_border->top;
+    assert_border_not_set(top);
+    const orcus::spreadsheet::border_attrs_t& bottom = cell_border->bottom;
+    assert_border_not_set(bottom);
 }
 
 void border_left_test(orcus::spreadsheet::import_styles& styles)
@@ -94,6 +105,12 @@ void border_left_test(orcus::spreadsheet::import_styles& styles)
     assert(cell_border);
     const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
     check_border(left, 0x00, 0x00, 0x00, 0);
+    const orcus::spreadsheet::border_attrs_t& right = cell_border->right;
+    assert_border_not_set(right);
+    const orcus::spreadsheet::border_attrs_t& top = cell_border->top;
+    assert_border_not_set(top);
+    const orcus::spreadsheet::border_attrs_t& bottom = cell_border->bottom;
+    assert_border_not_set(bottom);
 }
 
 void border_top_bottom_test(orcus::spreadsheet::import_styles& styles)
@@ -112,6 +129,10 @@ void border_top_bottom_test(orcus::spreadsheet::import_styles& styles)
     check_border(top, 0x00, 0x00, 0x00, 0);
     const orcus::spreadsheet::border_attrs_t& bottom = cell_border->bottom;
     check_border(bottom, 0x00, 0x00, 0x00, 0);
+    const orcus::spreadsheet::border_attrs_t& right = cell_border->right;
+    assert_border_not_set(right);
+    const orcus::spreadsheet::border_attrs_t& left = cell_border->left;
+    assert_border_not_set(left);
 }
 
 }
