@@ -308,10 +308,32 @@ void styles_context::end_child_context(xmlns_id_t ns, xml_token_t name, xml_cont
 
 namespace {
 
-spreadsheet::border_style_t get_interface_border_style(odf_helper::border_properties::odf_border_style_t /*style*/, bool style_set)
+spreadsheet::border_style_t get_interface_border_style(odf_helper::border_properties::odf_border_style_t style, bool style_set)
 {
-    if (style_set)
+    if (!style_set)
         return spreadsheet::border_style_t::unknown;
+
+    switch (style)
+    {
+        case odf_helper::border_properties::odf_border_style_t::none:
+        case odf_helper::border_properties::odf_border_style_t::hidden:
+            return spreadsheet::border_style_t::none;
+        break;
+        case odf_helper::border_properties::odf_border_style_t::double_border:
+            return spreadsheet::border_style_t::double_border;
+        break;
+        case odf_helper::border_properties::odf_border_style_t::solid:
+            return spreadsheet::border_style_t::medium;
+        break;
+        case odf_helper::border_properties::odf_border_style_t::dashed:
+            return spreadsheet::border_style_t::dashed;
+        break;
+        case odf_helper::border_properties::odf_border_style_t::dotted:
+            return spreadsheet::border_style_t::dotted;
+        break;
+        default:
+        break;
+    }
 
     return spreadsheet::border_style_t::medium;
 }
@@ -546,4 +568,5 @@ void styles_context::commit_default_styles()
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
