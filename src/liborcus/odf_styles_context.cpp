@@ -31,7 +31,7 @@ class style_attr_parser : public std::unary_function<xml_token_attr_t, void>
     pstring m_parent_name;
 public:
     style_attr_parser(const style_value_converter* converter) :
-        m_converter(converter), m_family(style_family_unknown) {}
+         m_converter(converter), m_family(style_family_unknown) {}
 
     void operator() (const xml_token_attr_t& attr)
     {
@@ -167,7 +167,15 @@ class cell_prop_attr_parser : std::unary_function<xml_token_attr_t, void>
     spreadsheet::color_elem_t m_background_red;
     spreadsheet::color_elem_t m_background_green;
     spreadsheet::color_elem_t m_background_blue;
+
+    length_t                            m_border_width;//At the time of writing this,orcus doesn't have feature of border width import
+    spreadsheet::border_style_t         m_border_style;
+    spreadsheet::color_elem_t           m_border_green ,m_border_blue ,m_border_red;
+    spreadsheet::border_direction_t     m_border_direction;
+
     bool m_background_color;
+    bool m_border;
+    bool m_four_side_border;
 
 public:
 
@@ -181,6 +189,48 @@ public:
                     m_background_color = odf_helper::convert_fo_color(attr.value, m_background_red,
                             m_background_green, m_background_blue);
                 break;
+
+                case XML_border:
+                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                                                                m_border_red,m_border_green,
+                                                                m_border_blue
+                                                                );
+                    m_four_side_border=true;
+                break;
+
+                case XML_border_top:
+                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                                                                m_border_red,m_border_green,
+                                                                m_border_blue
+                                                                );
+                    m_border_direction =spreadsheet::border_direction_t::top;
+                    break;
+
+                case XML_border_bottom:
+                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                                                                m_border_red,m_border_green,
+                                                                m_border_blue
+                                                                );
+                    m_border_direction =spreadsheet::border_direction_t::bottom;
+                break;
+
+                case XML_border_left:
+                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                                                                m_border_red,m_border_green,
+                                                                m_border_blue
+                                                                );
+                    m_border_direction =spreadsheet::border_direction_t::left;
+                break;
+
+                case XML_border_right:
+                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                                                                m_border_red,m_border_green,
+                                                                m_border_blue
+                                                                );
+                    m_border_direction =spreadsheet::border_direction_t::right;
+                break;
+
+  
                 default:
                     ;
             }
@@ -194,6 +244,39 @@ public:
         red = m_background_red;
         green = m_background_green;
         blue = m_background_blue;
+    }
+
+    bool has_border()       
+    {
+        return m_border;
+    }
+
+    void get_border_style(spreadsheet::border_style_t& style) 
+    {
+        style=m_border_style;
+    }
+
+    void get_border_width(length_t& width) 
+    {
+        width=m_border_width;
+    }
+
+    void get_border_direction(spreadsheet::border_direction_t& direction) 
+    {
+        direction=m_border_direction; 
+    }
+
+    bool has_four_side_border()
+    {
+        return m_four_side_border;
+    }
+
+    void get_border_color(spreadsheet::color_elem_t& red, spreadsheet::color_elem_t& green,
+                          spreadsheet::color_elem_t& blue) 
+    { 
+        red=m_border_red;
+        green=m_border_green;
+        blue=m_border_blue;
     }
 };
 
@@ -380,15 +463,59 @@ void styles_context::start_element(xmlns_id_t ns, xml_token_t name, const std::v
                         mp_styles->set_fill_bg_color(0, red, green, blue);
                     }
 
-                    size_t fill = mp_styles->commit_fill();
+                    if(func.has_border())
+                    {   
+                        spreadsheet::border_style_t border_style;
+                        spreadsheet::border_direction_t border_direction;
+                        length_t border_width;
+                        spreadsheet::color_elem_t red;
+                        spreadsheet::color_elem_t green;
+                        spreadsheet::color_elem_t blue;
+
+                        if (func.has_four_side_border()) // then apply border styles to each cells explicitly.
+                        {
+                            func.get_border_style(border_style);
+                            func.get_border_color(red,green,blue);
+
+                            mp_styles->set_border_style(spreadsheet::border_direction_t::top,border_style);
+                            mp_styles->set_border_color(spreadsheet::border_direction_t::top,0,red,green,blue);
+                            
+                            mp_styles->set_border_style(spreadsheet::border_direction_t::bottom,border_style);
+                            mp_styles->set_border_color(spreadsheet::border_direction_t::bottom,0,red,green,blue);
+                            
+                            mp_styles->set_border_style(spreadsheet::border_direction_t::left,border_style);
+                            mp_styles->set_border_color(spreadsheet::border_direction_t::left,0,red,green,blue);
+                            
+                            mp_styles->set_border_style(spreadsheet::border_direction_t::right,border_style);
+                            mp_styles->set_border_color(spreadsheet::border_direction_t::right,0,red,green,blue);
+
+                        }
+
+                        else    // if border is required to apply to one of sides only.
+                        {
+                            func.get_border_direction(border_direction);
+                            func.get_border_style(border_style);
+                            func.get_border_color(red,green,blue);
+                            
+                            mp_styles->set_border_style(border_direction,border_style);
+                            mp_styles->set_border_color(border_direction,0,red,green,blue);
+                        }
+
+
+                    }
+                    size_t border_id = mp_styles->commit_border();
+                    size_t fill_id = mp_styles->commit_fill();
                     switch (m_current_style->family)
                     {
                         case style_family_table_cell:
                         {
                             odf_style::cell* data = m_current_style->cell_data;
-                            data->fill = fill;
+                            data->fill = fill_id;
+                            data->border=border_id;
                         }
+
                         break;
+
                         default:
                         ;
                     }

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<office:styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0">
+  <style:style style:name="Note" style:family="table-cell" style:parent-style-name="Text">
+    <style:table-cell-properties  fo:border="0.06pt dashed #feffcc"/>
+  </style:style>
+  <style:style style:name="important" style:family="table-cell" style:parent-style-name="Text">
+    <style:table-cell-properties  fo:border="0.06pt thick #feffcc"/>
+  </style:style>
+</office:styles>
