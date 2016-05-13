@@ -21,7 +21,7 @@ public:
             orcus::spreadsheet::color_elem_t& green, orcus::spreadsheet::color_elem_t& blue);
 
     /* extracts border style,width and colors out of the pstring provided to it */
-    static bool extract_border_details(const orcus::pstring& value,length_t                           &m_border_width,
+    static void extract_border_details(const orcus::pstring& value,length_t                           &m_border_width,
                                                                     spreadsheet::border_style_t       &m_border_style,
                                                                     spreadsheet::color_elem_t         &m_border_red,
                                                                     spreadsheet::color_elem_t         &m_border_green,

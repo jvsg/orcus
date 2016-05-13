@@ -6,13 +6,39 @@
  */
 
 #include "odf_helper.hpp"
-#include <sstream>
+#include "string_helper.hpp"
 #include <orcus/spreadsheet/types.hpp>
 #include <orcus/measurement.hpp>
+#include <mdds/sorted_string_map.hpp>
+#include <mdds/global.hpp>
+#include <orcus/global.hpp>
 
 namespace orcus {
 
 namespace {
+
+typedef mdds::sorted_string_map<spreadsheet::border_style_t> odf_border_style_map;
+
+odf_border_style_map::entry odf_border_style_entries[] =
+{
+    {    MDDS_ASCII("unknown")           , spreadsheet::border_style_t::unknown},
+    {    MDDS_ASCII("none")              , spreadsheet::border_style_t::none},
+    {    MDDS_ASCII("solid")             , spreadsheet::border_style_t::solid},
+    {    MDDS_ASCII("dash_dot")          , spreadsheet::border_style_t::dash_dot},
+    {    MDDS_ASCII("dash_dot_dot")      , spreadsheet::border_style_t::dash_dot_dot},
+    {    MDDS_ASCII("dashed")            , spreadsheet::border_style_t::dashed},
+    {    MDDS_ASCII("dotted")            , spreadsheet::border_style_t::dotted},
+    {    MDDS_ASCII("double_border")     , spreadsheet::border_style_t::double_border},
+    {    MDDS_ASCII("hair")              , spreadsheet::border_style_t::hair},
+    {    MDDS_ASCII("medium")            , spreadsheet::border_style_t::medium},
+    {    MDDS_ASCII("medium_dash_dot")   , spreadsheet::border_style_t::medium_dash_dot},
+    {    MDDS_ASCII("medium_dash_dot_dot"), spreadsheet::border_style_t::medium_dash_dot_dot},
+    {    MDDS_ASCII("medium_dashed")     , spreadsheet::border_style_t::medium_dashed},
+    {    MDDS_ASCII("slant_dash_dot")    , spreadsheet::border_style_t::slant_dash_dot},
+    {    MDDS_ASCII("thick")             , spreadsheet::border_style_t::thick},
+    {    MDDS_ASCII("thin")              , spreadsheet::border_style_t::thin}    
+};
+
 
 bool is_valid_hex_digit(const char& character, orcus::spreadsheet::color_elem_t& val)
 {
@@ -70,7 +96,7 @@ bool odf_helper::convert_fo_color(const pstring& value, orcus::spreadsheet::colo
     return convert_color_digits(value, blue, 5);
 }
 
-bool odf_helper::extract_border_details(const orcus::pstring& value,
+void odf_helper::extract_border_details(const   orcus::pstring                    &value,
                                                 length_t                          &m_border_width,
                                                 spreadsheet::border_style_t       &m_border_style,
                                                 spreadsheet::color_elem_t         &m_border_red,
@@ -81,40 +107,25 @@ bool odf_helper::extract_border_details(const orcus::pstring& value,
     orcus::pstring width;
     orcus::pstring style;
 
-    std::stringstream ss(value.str());
-    std::string buffer;
+    std::vector<pstring> detail = orcus::string_helper::split_string(value,' ');
 
-    std::getline(ss,buffer,' ');
-    width=buffer.c_str();
-    m_border_width=to_length(width);
+    for(auto& sub_detail : detail)
+    {
+        if(sub_detail[0] == '#')
+            convert_fo_color(sub_detail,m_border_red,m_border_green,m_border_blue);
 
-    std::getline(ss,buffer,' ');
+        else if(sub_detail[0] >= '0' && sub_detail[0] <='9')
+            m_border_width = orcus::to_length(sub_detail);
 
-    if(buffer=="unknown"                 ) m_border_style =  spreadsheet::border_style_t::unknown;
-    else if(buffer=="none"               ) m_border_style = spreadsheet::border_style_t::none;
-    else if(buffer=="dash_dot"           ) m_border_style = spreadsheet::border_style_t::dash_dot;
-    else if(buffer=="dash_dot_dot"       ) m_border_style = spreadsheet::border_style_t::dash_dot_dot;
-    else if(buffer=="dashed"             ) m_border_style = spreadsheet::border_style_t::dashed;
-    else if(buffer=="dotted"             ) m_border_style = spreadsheet::border_style_t::dotted;
-    else if(buffer=="double_border"      ) m_border_style = spreadsheet::border_style_t::double_border;
-    else if(buffer=="hair"               ) m_border_style = spreadsheet::border_style_t::hair;
-    else if(buffer=="medium"             ) m_border_style = spreadsheet::border_style_t::medium;
-    else if(buffer=="medium_dash_dot"    ) m_border_style = spreadsheet::border_style_t::medium_dash_dot;
-    else if(buffer=="medium_dash_dot_dot") m_border_style = spreadsheet::border_style_t::medium_dash_dot_dot;
-    else if(buffer=="medium_dashed"      ) m_border_style = spreadsheet::border_style_t::medium_dashed;
-    else if(buffer=="slant_dash_dot"     ) m_border_style = spreadsheet::border_style_t::slant_dash_dot;
-    else if(buffer=="thick"              ) m_border_style = spreadsheet::border_style_t::thick;
-    else if(buffer=="thin"               ) m_border_style = spreadsheet::border_style_t::thin;
+        else    //  This has to be a style
+        {
+            odf_border_style_map border_style_map(odf_border_style_entries, ORCUS_N_ELEMENTS(odf_border_style_entries), spreadsheet::border_style_t::none);
+            m_border_style = border_style_map.find(sub_detail.get(), sub_detail.size());
+        }
     
-    std::getline(ss,buffer,' ');
-    color_code=buffer.c_str();
-    
-    if(!convert_fo_color(color_code,m_border_red, m_border_green,m_border_blue))
-        return false;
-    
-    return true;
-}
+    }
         
+}
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

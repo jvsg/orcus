@@ -164,11 +164,11 @@ public:
 class cell_prop_attr_parser : std::unary_function<xml_token_attr_t, void>
 {
 
-    spreadsheet::color_elem_t m_background_red;
-    spreadsheet::color_elem_t m_background_green;
-    spreadsheet::color_elem_t m_background_blue;
+    spreadsheet::color_elem_t           m_background_red;
+    spreadsheet::color_elem_t           m_background_green;
+    spreadsheet::color_elem_t           m_background_blue;
 
-    length_t                            m_border_width;//At the time of writing this,orcus doesn't have feature of border width import
+    length_t                            m_border_width;
     spreadsheet::border_style_t         m_border_style;
     spreadsheet::color_elem_t           m_border_green ,m_border_blue ,m_border_red;
     spreadsheet::border_direction_t     m_border_direction;
@@ -191,43 +191,52 @@ public:
                 break;
 
                 case XML_border:
-                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                    odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
                                                                 m_border_red,m_border_green,
                                                                 m_border_blue
                                                                 );
-                    m_four_side_border=true;
+                    m_border = true;
+                    m_four_side_border = true;
                 break;
 
                 case XML_border_top:
-                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                    odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
                                                                 m_border_red,m_border_green,
                                                                 m_border_blue
                                                                 );
-                    m_border_direction =spreadsheet::border_direction_t::top;
+                    m_border = true;
+                    m_border_direction = spreadsheet::border_direction_t::top;
+                    m_four_side_border = false;
                     break;
 
                 case XML_border_bottom:
-                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                    odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
                                                                 m_border_red,m_border_green,
                                                                 m_border_blue
                                                                 );
-                    m_border_direction =spreadsheet::border_direction_t::bottom;
+                    m_border = true;
+                    m_border_direction = spreadsheet::border_direction_t::bottom;
+                    m_four_side_border = false;
                 break;
 
                 case XML_border_left:
-                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                    odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
                                                                 m_border_red,m_border_green,
                                                                 m_border_blue
                                                                 );
-                    m_border_direction =spreadsheet::border_direction_t::left;
+                    m_border = true;
+                    m_border_direction = spreadsheet::border_direction_t::left;
+                    m_four_side_border = false;
                 break;
 
                 case XML_border_right:
-                    m_border=odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
+                    odf_helper::extract_border_details(attr.value,m_border_width,m_border_style,
                                                                 m_border_red,m_border_green,
                                                                 m_border_blue
                                                                 );
-                    m_border_direction =spreadsheet::border_direction_t::right;
+                    m_border = true;
+                    m_border_direction = spreadsheet::border_direction_t::right;
+                    m_four_side_border = false;
                 break;
 
   
@@ -238,6 +247,7 @@ public:
     }
 
     bool has_background_color() { return m_background_color; }
+
     void get_background_color(spreadsheet::color_elem_t& red,
             spreadsheet::color_elem_t& green, spreadsheet::color_elem_t& blue)
     {
@@ -253,17 +263,17 @@ public:
 
     void get_border_style(spreadsheet::border_style_t& style) 
     {
-        style=m_border_style;
+        style = m_border_style;
     }
 
     void get_border_width(length_t& width) 
     {
-        width=m_border_width;
+        width = m_border_width;
     }
 
     void get_border_direction(spreadsheet::border_direction_t& direction) 
     {
-        direction=m_border_direction; 
+        direction = m_border_direction; 
     }
 
     bool has_four_side_border()
@@ -274,9 +284,9 @@ public:
     void get_border_color(spreadsheet::color_elem_t& red, spreadsheet::color_elem_t& green,
                           spreadsheet::color_elem_t& blue) 
     { 
-        red=m_border_red;
-        green=m_border_green;
-        blue=m_border_blue;
+        red = m_border_red;
+        green = m_border_green;
+        blue = m_border_blue;
     }
 };
 
@@ -467,7 +477,7 @@ void styles_context::start_element(xmlns_id_t ns, xml_token_t name, const std::v
                     {   
                         spreadsheet::border_style_t border_style;
                         spreadsheet::border_direction_t border_direction;
-                        length_t border_width;
+                        length_t width;
                         spreadsheet::color_elem_t red;
                         spreadsheet::color_elem_t green;
                         spreadsheet::color_elem_t blue;
@@ -476,18 +486,23 @@ void styles_context::start_element(xmlns_id_t ns, xml_token_t name, const std::v
                         {
                             func.get_border_style(border_style);
                             func.get_border_color(red,green,blue);
+                            func.get_border_width(width);
 
                             mp_styles->set_border_style(spreadsheet::border_direction_t::top,border_style);
                             mp_styles->set_border_color(spreadsheet::border_direction_t::top,0,red,green,blue);
-                            
+                            mp_styles->set_border_width(spreadsheet::border_direction_t::top,width);
+
                             mp_styles->set_border_style(spreadsheet::border_direction_t::bottom,border_style);
                             mp_styles->set_border_color(spreadsheet::border_direction_t::bottom,0,red,green,blue);
-                            
+                            mp_styles->set_border_width(spreadsheet::border_direction_t::bottom,width);
+
                             mp_styles->set_border_style(spreadsheet::border_direction_t::left,border_style);
                             mp_styles->set_border_color(spreadsheet::border_direction_t::left,0,red,green,blue);
-                            
+                            mp_styles->set_border_width(spreadsheet::border_direction_t::left,width);
+
                             mp_styles->set_border_style(spreadsheet::border_direction_t::right,border_style);
                             mp_styles->set_border_color(spreadsheet::border_direction_t::right,0,red,green,blue);
+                            mp_styles->set_border_width(spreadsheet::border_direction_t::right,width);
 
                         }
 
@@ -496,9 +511,11 @@ void styles_context::start_element(xmlns_id_t ns, xml_token_t name, const std::v
                             func.get_border_direction(border_direction);
                             func.get_border_style(border_style);
                             func.get_border_color(red,green,blue);
-                            
+                            func.get_border_width(width);
+
                             mp_styles->set_border_style(border_direction,border_style);
                             mp_styles->set_border_color(border_direction,0,red,green,blue);
+                            mp_styles->set_border_width(border_direction,width);
                         }
 
 

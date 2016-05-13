@@ -11,7 +11,7 @@
 #include "orcus/spreadsheet/import_interface.hpp"
 #include "orcus/pstring.hpp"
 #include "orcus/env.hpp"
-
+#include <orcus/measurement.hpp>
 #include <vector>
 
 namespace orcus {
@@ -60,6 +60,7 @@ struct ORCUS_SPM_DLLPUBLIC border_attrs_t
 {
     border_style_t style;
     color_t border_color;
+    length_t border_width;
 
     border_attrs_t();
     void reset();
@@ -157,6 +158,7 @@ public:
     virtual void set_border_style(border_direction_t dir, border_style_t style);
     virtual void set_border_color(
         border_direction_t dir, color_elem_t alpha, color_elem_t red, color_elem_t green, color_elem_t blue);
+    virtual void set_border_width(border_direction_t dir,length_t length);
     virtual size_t commit_border();
 
     virtual void set_cell_hidden(bool b);
