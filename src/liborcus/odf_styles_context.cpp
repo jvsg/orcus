@@ -215,7 +215,17 @@ public:
                     border_details = odf_helper::extract_border_details(attr.value);
                     m_border_style_dir_pair.insert(std::make_pair(spreadsheet::border_direction_t::right , border_details));
                 break;
-
+                case XML_diagonal_bl_tr:
+                {
+                    border_details = odf_helper::extract_border_details(attr.value);
+                    m_border_style_dir_pair.insert(std::make_pair(spreadsheet::border_direction_t::diagonal_bl_tr , border_details));
+                }
+                break;
+                case XML_diagonal_tl_br:
+                {
+                    border_details = odf_helper::extract_border_details(attr.value);
+                    m_border_style_dir_pair.insert(std::make_pair(spreadsheet::border_direction_t::diagonal_tl_br , border_details));
+                }
   
                 default:
                     ;
