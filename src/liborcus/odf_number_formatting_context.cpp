@@ -734,6 +734,19 @@ void number_formatting_context::start_element(xmlns_id_t ns, xml_token_t name, c
                     m_current_style->number_formatting_code += "0";
             }
             break;
+            case XML_boolean_style:
+            {
+                boolean_style_attr_parser func;
+                func = std::for_each(attrs.begin(), attrs.end(), func);
+                m_current_style->name = func.get_style_name();
+                m_current_style->is_volatile = func.is_volatile();
+            }
+            break;
+            case XML_boolean:
+            {
+                m_current_style->number_formatting_code += "BOOLEAN";
+            }
+            break;
             case XML_text_style:
             {
                 text_style_attr_parser func;
@@ -774,7 +787,7 @@ bool number_formatting_context::end_element(xmlns_id_t ns, xml_token_t name)
     if (ns == NS_odf_number)
     {
         if (name == XML_number_style || name == XML_currency_style || name == XML_percentage_style
-            || name == XML_text_style)
+            || name == XML_text_style || name == XML_boolean_style)
         {
             if (m_current_style->is_volatile)
             {
