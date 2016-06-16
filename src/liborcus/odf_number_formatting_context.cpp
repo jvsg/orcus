@@ -427,8 +427,14 @@ class fraction_attr_parser : std::unary_function<xml_token_attr_t, void>
     size_t m_min_int_digits;
     size_t m_min_deno_digits;
     size_t m_min_num_digits;
+    pstring m_deno_value;
+
+    bool m_predefined_deno;
 
 public:
+    fraction_attr_parser():
+        m_predefined_deno(false)
+    {}
 
     void operator() (const xml_token_attr_t& attr)
     {
@@ -443,6 +449,12 @@ public:
             case XML_min_denominator_digits:
                 m_min_deno_digits = boost::lexical_cast<size_t>(attr.value.str());
             break;
+            case XML_denominator_value:
+            {
+                m_deno_value = attr.value;
+                m_predefined_deno = true;
+            }
+            break;
             default:
                 ;
         }
@@ -451,6 +463,8 @@ public:
     const size_t& get_min_int_digits() const { return m_min_int_digits;}
     const size_t& get_min_num_digits() const { return m_min_num_digits;}
     const size_t& get_min_deno_digits() const { return m_min_deno_digits;}
+    const pstring& get_deno_value() const { return m_deno_value;}
+    const bool has_predefined_deno() const { return m_predefined_deno;}
 };
 
 class boolean_style_attr_parser : std::unary_function<xml_token_attr_t, void>
@@ -745,6 +759,28 @@ void number_formatting_context::start_element(xmlns_id_t ns, xml_token_t name, c
             case XML_boolean:
             {
                 m_current_style->number_formatting_code += "BOOLEAN";
+            }
+            break;
+            case XML_fraction:
+            {
+                fraction_attr_parser func;
+                func = std::for_each(attrs.begin(), attrs.end(), func);
+
+                for (size_t i = 0; i < func.get_min_int_digits(); i++)
+                    m_current_style->number_formatting_code += "#";
+
+                if (func.get_min_int_digits() != 0)
+                    m_current_style->number_formatting_code += " ";
+
+                for (size_t i = 0; i < func.get_min_num_digits(); i++)
+                    m_current_style->number_formatting_code += "?";
+
+                m_current_style->number_formatting_code += "/";
+                if (func.has_predefined_deno())
+                    m_current_style->number_formatting_code += func.get_deno_value();
+                else
+                    for(size_t i = 0; i < func.get_min_deno_digits(); i++)
+                        m_current_style->number_formatting_code += "?";
             }
             break;
             case XML_text_style:
