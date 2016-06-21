@@ -9,6 +9,7 @@ if BUILD_SPREADSHEET_MODEL
 
 liborcus_HEADERS += \
 	auto_filter.hpp \
+	conditional_format.hpp
 	document.hpp \
 	factory.hpp \
 	global_settings.hpp \
