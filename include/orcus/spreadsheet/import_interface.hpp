@@ -308,7 +308,7 @@ public:
     /**
      * commits the current condition to the current entry.
      */
-    virtual void commit_condition() = 0;
+    virtual size_t commit_condition() = 0;
 
     /**
      * Name of the icons to use in the current entry.
