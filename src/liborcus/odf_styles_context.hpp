@@ -19,6 +19,7 @@ namespace orcus {
 
 namespace spreadsheet { namespace iface {
     class import_styles;
+    class import_conditional_format;
 }}
 
 class style_value_converter
@@ -53,6 +54,7 @@ private:
 
 private:
     spreadsheet::iface::import_styles* mp_styles;
+    spreadsheet::iface::import_conditional_format* mp_cond_format;
     odf_styles_map_type& m_styles;
     std::unique_ptr<xml_context_base> mp_child;
 
