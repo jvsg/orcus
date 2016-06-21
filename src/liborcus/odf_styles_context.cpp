@@ -13,6 +13,7 @@
 #include "orcus/spreadsheet/import_interface.hpp"
 #include "odf_number_formatting_context.hpp"
 #include <iostream>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 
@@ -386,6 +387,129 @@ public:
 
 };
 
+class map_prop_attr_parser : std::unary_function<xml_token_attr_t, void>
+{
+    spreadsheet::conditional_format_t m_condition;
+    spreadsheet::condition_operator_t m_operator;
+    pstring m_style_name;
+    pstring m_formula;
+    std::vector<size_t> m_value;
+
+    bool m_has_style_name;
+    bool m_has_condition;
+    bool m_has_formula;
+
+public:
+
+    map_prop_attr_parser():
+        m_has_style_name(false),
+        m_has_condition(false),
+        m_has_formula(false)
+    {}
+
+    void operator() (const xml_token_attr_t& attr)
+    {
+        if (attr.ns == NS_odf_style)
+        {
+            switch (attr.name)
+            {
+                case XML_condition:
+                {
+                    std::string condition;
+                    std::string operator_expression;
+                    std::string numerical_value;
+                    std::string formula;
+
+                    for (size_t i = 0; i < attr.value.size(); i++)
+                    {
+                        if (isalpha(attr.value[i]) || attr.value[i] == '-')
+                            condition += attr.value.str()[i];
+                        else if (isdigit(attr.value[i]))
+                            numerical_value += attr.value.str()[i];
+                        else if (attr.value[i] == ',')
+                        {
+                            m_value.push_back(boost::lexical_cast<size_t>(numerical_value));
+                            numerical_value.clear();
+                        }
+                        else if (attr.value[i] == '<' || attr.value[i] == '>' || attr.value[i] == '=' || attr.value[i] == '!')
+                            operator_expression += attr.value.str()[i];
+                        else if (attr.value[i] == '(')
+                        {
+                            for (size_t j = i+1; attr.value[j] != ')'; j++)
+                                formula += attr.value.str()[j];
+                        }
+                    }
+                    if (!numerical_value.empty())
+                        m_value.push_back(boost::lexical_cast<size_t>(numerical_value)); // to push the remaining numerical value
+
+                    if (condition == "cell-content")
+                    {
+                        m_condition = spreadsheet::conditional_format_t::condition;
+                        m_has_condition = true;
+                    }
+                    else if (condition.substr(0, 15) == "is-true-formula")
+                    {
+                        m_condition = spreadsheet::conditional_format_t::formula;
+                    }
+                    else if (condition == "cell-content-is-between")
+                    {
+                        m_condition = spreadsheet::conditional_format_t::condition;
+                        m_operator = spreadsheet::condition_operator_t::between;
+                        m_has_condition = true;
+                    }
+                    else if (condition == "cell-content-is-not-between")
+                    {
+                        m_condition = spreadsheet::conditional_format_t::condition;
+                        m_operator = spreadsheet::condition_operator_t::not_between;
+                        m_has_condition = true;
+                    }
+                    else
+                    {
+                        m_condition = spreadsheet::conditional_format_t::unknown;
+                        m_operator = spreadsheet::condition_operator_t::unknown;
+                    }
+
+                    if (condition.substr(0, 15) == "is-true-formula")
+                    {
+                        m_formula = pstring(formula.c_str(), formula.size());
+                        m_has_formula = true;
+                    }
+
+                    if (operator_expression == "<")
+                        m_operator = spreadsheet::condition_operator_t::less;
+                    else if (operator_expression == "<=")
+                        m_operator = spreadsheet::condition_operator_t::less_equal;
+                    else if (operator_expression == ">")
+                        m_operator = spreadsheet::condition_operator_t::greater;
+                    else if (operator_expression == ">=")
+                        m_operator = spreadsheet::condition_operator_t::greater_equal;
+                    else if (operator_expression == "=")
+                        m_operator = spreadsheet::condition_operator_t::equal;
+                    else if (operator_expression == "!=")
+                        m_operator = spreadsheet::condition_operator_t::not_equal;
+                }
+                break;
+                case XML_apply_style_name:
+                {
+                    m_style_name = attr.value;
+                    m_has_style_name = true;
+                }
+                break;
+                default:
+                    ;
+            }
+        }
+    }
+    const spreadsheet::conditional_format_t get_condition() const { return m_condition;}
+    const spreadsheet::condition_operator_t get_operator() const { return m_operator;}
+    const pstring& get_style_name() const { return m_style_name;}
+    const pstring& get_formula() const { return m_formula;}
+    const vector<size_t>& get_values() const { return m_value;}
+    const bool has_style_name() const { return m_has_style_name;}
+    const bool has_condition() const { return m_has_condition;}
+    const bool has_formula() const { return m_has_formula;}
+};
+
 }
 
 style_value_converter::style_value_converter()
@@ -644,6 +768,31 @@ void styles_context::start_element(xmlns_id_t ns, xml_token_t name, const std::v
                             ;
                     }
                 }
+            }
+            break;
+            case XML_map:
+            {
+                xml_element_expected(parent, NS_odf_style, XML_style);
+                map_prop_attr_parser func;
+                func = std::for_each(attrs.begin(), attrs.end(), func);
+
+                if (func.has_condition())
+                {
+                    mp_cond_format->set_type(func.get_condition());
+                    mp_cond_format->set_values(func.get_values());
+                    mp_cond_format->set_operator(func.get_operator());
+                }
+                if (func.has_formula())
+                {
+                    mp_cond_format->set_type(func.get_condition());
+                    mp_cond_format->set_formula(func.get_formula().get(), func.get_formula().size());
+                }
+                if (func.has_style_name())
+                    mp_cond_format->set_style_name(func.get_style_name().get(), func.get_style_name().size());
+
+                size_t cond_format_id = mp_cond_format->commit_condition();
+                mp_styles->set_xf_condition(cond_format_id);
+
             }
             break;
             default:
