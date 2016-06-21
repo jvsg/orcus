@@ -116,6 +116,7 @@ struct ORCUS_SPM_DLLPUBLIC cell_format_t
     size_t protection;      /// protection ID
     size_t number_format;   /// number format ID
     size_t style_xf;        /// style XF ID (used only for cell format)
+    size_t condition;       /// condition ID
     hor_alignment_t hor_align;
     ver_alignment_t ver_align;
     bool apply_num_format:1;
@@ -124,6 +125,7 @@ struct ORCUS_SPM_DLLPUBLIC cell_format_t
     bool apply_border:1;
     bool apply_alignment:1;
     bool apply_protection:1;
+    bool apply_condition:1;
 
     cell_format_t();
     void reset();
@@ -199,6 +201,7 @@ public:
     virtual void set_xf_border(size_t index);
     virtual void set_xf_protection(size_t index);
     virtual void set_xf_number_format(size_t index);
+    virtual void set_xf_condition(size_t index);
     virtual void set_xf_style_xf(size_t index);
     virtual void set_xf_apply_alignment(bool b);
     virtual void set_xf_horizontal_alignment(orcus::spreadsheet::hor_alignment_t align);

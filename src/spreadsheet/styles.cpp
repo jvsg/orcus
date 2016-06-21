@@ -406,6 +406,11 @@ void import_styles::set_xf_number_format(size_t index)
     m_cur_cell_format.number_format = index;
 }
 
+void import_styles::set_xf_condition(size_t index)
+{
+    m_cur_cell_format.condition = index;
+}
+
 void import_styles::set_xf_style_xf(size_t index)
 {
     m_cur_cell_format.style_xf = index;

@@ -49,6 +49,7 @@ struct odf_style
         size_t fill;
         size_t border;
         size_t protection;
+        size_t conditional_format;
 
         size_t xf;
         bool automatic_style;
