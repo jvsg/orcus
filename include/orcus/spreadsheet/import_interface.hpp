@@ -13,6 +13,7 @@
 #include "orcus/spreadsheet/types.hpp"
 #include "orcus/types.hpp"
 #include "orcus/env.hpp"
+#include <vector>
 
 // NB: This header must not depend on ixion, as it needs to be usable for
 // those clients that provide their own formula engine.  Other headers in
@@ -278,6 +279,15 @@ public:
      */
     virtual void set_color(color_elem_t alpha, color_elem_t red,
             color_elem_t green, color_elem_t blue) = 0;
+
+    /*
+     * Sets the name of the style that has to be applied
+     * Used for type == condition
+     */
+    virtual void set_style_name(const char*  p, size_t n) = 0;
+
+    /* sets the values required for conditions*/
+    virtual void set_values(std::vector<size_t> v) = 0;
 
     /**
      * Sets the formula, value or string of the current condition.
