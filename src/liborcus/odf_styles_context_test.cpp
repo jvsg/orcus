@@ -1,5 +1,5 @@
 #include <orcus/orcus_import_ods.hpp>
-
+#include <orcus/spreadsheet/conditional_format.hpp>
 #include <orcus/spreadsheet/styles.hpp>
 
 #include <orcus/string_pool.hpp>
@@ -270,18 +270,48 @@ void test_odf_number_formatting(orcus::spreadsheet::import_styles& styles)
     assert(cell_number_format->format_string.str() == "[>=0]0.00;[RED]-0.00");
 
 }
+
+void test_odf_conditional_format(orcus::spreadsheet::import_styles& styles,
+    orcus::spreadsheet::import_conditional_format& cond_format)
+{
+    const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("Name20", &styles);
+    size_t xf = style->xf;
+    const orcus::spreadsheet::cell_format_t* cell_format = styles.get_cell_style_format(xf);
+
+    size_t conditional_format = cell_format->condition;
+    const orcus::spreadsheet::condition_t* cell_conditional_format = cond_format.get_conditional_format(conditional_format);
+    assert(cell_conditional_format->mapped_name == "Result2");
+    assert(cell_conditional_format->condition_operator == orcus::spreadsheet::condition_operator_t::greater);
+    assert(cell_conditional_format->condition_type == orcus::spreadsheet::conditional_format_t::condition);
+    assert(cell_conditional_format->values[0] == 5);
+
+    style = find_cell_style_by_name("Name21", &styles);
+    xf = style->xf;
+    cell_format = styles.get_cell_style_format(xf);
+
+    conditional_format = cell_format->condition;
+    cell_conditional_format = cond_format.get_conditional_format(conditional_format);
+    assert(cell_conditional_format->mapped_name == "Default");
+    assert(cell_conditional_format->condition_type == orcus::spreadsheet::conditional_format_t::condition);
+    assert(cell_conditional_format->condition_operator == orcus::spreadsheet::condition_operator_t::between);
+    assert(cell_conditional_format->values[0] == 10);
+    assert(cell_conditional_format->values[1] == 20);
+
+}
 int main()
 {
     orcus::string_pool string_pool;
     const char* path = SRCDIR"/test/ods/styles/cell-styles.xml";
     std::string content = orcus::load_file_content(path);
     orcus::spreadsheet::import_styles styles(string_pool);
-    orcus::import_ods::read_styles(content.c_str(), content.size(), &styles);
+    orcus::spreadsheet::import_conditional_format cond_format(string_pool);
+    orcus::import_ods::read_styles(content.c_str(), content.size(), &styles, &cond_format);
 
     test_odf_fill(styles);
     test_odf_border(styles);
     test_odf_cell_protection(styles);
     test_odf_font(styles);
+    test_odf_conditional_format(styles, cond_format);
 
     orcus::string_pool string_pool2;
     path = SRCDIR"/test/ods/styles/number-format.xml";

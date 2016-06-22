@@ -27,4 +27,10 @@
   <style:style style:name="Name9" style:family="table-cell" style:parent-style-name="Text">
 <style:text-properties style:font-name="Tahoma" style:text-underline-style="dash" fo:font-size="00pt" style:text-underline-color="#1856ff" fo:font-weight="bold" style:text-underline-width="bold"/>
   </style:style>
+<style:style style:name="Name20" style:family="table-cell" style:parent-style-name="Text">
+<style:map style:condition="cell-content()>5" style:apply-style-name="Result2" style:base-cell-address="Sheet1.A1"/>
+</style:style>
+<style:style style:name="Name21" style:family="table-cell" style:parent-style-name="Text">
+<style:map style:condition="cell-content-is-between(10,20)" style:apply-style-name="Default" style:base-cell-address="Sheet1.A1"/>
+</style:style>
 </office:styles>
