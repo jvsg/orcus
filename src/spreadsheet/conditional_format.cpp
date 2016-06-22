@@ -69,6 +69,14 @@ void import_conditional_format::set_values(std::vector<size_t> v)
     m_cur_conditional_format.values = v;
 }
 
+const condition_t* import_conditional_format::get_conditional_format(size_t index)
+{
+    if (index >= m_conditional_formats.size())
+        return NULL;
+
+    return &m_conditional_formats[index];
+}
+
 void import_conditional_format::set_date(orcus::spreadsheet::condition_date_t) {}
 void import_conditional_format::set_icon_name(const char* p, size_t n) {}
 

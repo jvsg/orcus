@@ -68,7 +68,7 @@ public:
             orcus::spreadsheet::row_t row_end, orcus::spreadsheet::col_t col_end);
     virtual void commit_format();
 
-    const conditional_format_t* get_conditional_format(size_t index) const;
+    const condition_t* get_conditional_format(size_t index);
 
 
 private:
