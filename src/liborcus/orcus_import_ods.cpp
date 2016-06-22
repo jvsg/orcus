@@ -21,7 +21,8 @@
 
 namespace orcus {
 
-void import_ods::read_styles(const char* p, size_t n, spreadsheet::iface::import_styles* styles)
+void import_ods::read_styles(const char* p, size_t n, spreadsheet::iface::import_styles* styles,
+    spreadsheet::iface::import_conditional_format* cond_format)
 {
     if(!styles)
         return;
@@ -31,7 +32,7 @@ void import_ods::read_styles(const char* p, size_t n, spreadsheet::iface::import
 
     session_context cxt;
     odf_styles_map_type styles_map;
-    auto context = orcus::make_unique<styles_context>(cxt, odf_tokens, styles_map, styles);
+    auto context = orcus::make_unique<styles_context>(cxt, odf_tokens, styles_map, styles, cond_format);
 
     xml_stream_handler stream_handler(context.release());
 

@@ -544,9 +544,10 @@ odf_style_family style_value_converter::to_style_family(const pstring& val) cons
 
 styles_context::styles_context(
     session_context& session_cxt, const tokens& tk, odf_styles_map_type& styles,
-    spreadsheet::iface::import_styles* iface_styles) :
+    spreadsheet::iface::import_styles* iface_styles, spreadsheet::iface::import_conditional_format* cond_format):
     xml_context_base(session_cxt, tk),
     mp_styles(iface_styles),
+    mp_cond_format(cond_format),
     m_styles(styles),
     m_automatic_styles(false)
 {

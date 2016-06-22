@@ -40,7 +40,8 @@ class styles_context : public xml_context_base
 {
 public:
     styles_context(
-        session_context& session_cxt, const tokens& tk, odf_styles_map_type& styles, spreadsheet::iface::import_styles* iface_styles);
+        session_context& session_cxt, const tokens& tk, odf_styles_map_type& styles, spreadsheet::iface::import_styles* iface_styles,
+        spreadsheet::iface::import_conditional_format* cond_format = nullptr);
 
     virtual bool can_handle_element(xmlns_id_t ns, xml_token_t name) const;
     virtual xml_context_base* create_child_context(xmlns_id_t ns, xml_token_t name);

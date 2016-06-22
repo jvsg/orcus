@@ -14,6 +14,7 @@ namespace orcus {
 
 namespace spreadsheet { namespace iface {
     class import_styles;
+    class import_conditional_format;
 }}
 
 class ORCUS_DLLPUBLIC import_ods
@@ -24,7 +25,8 @@ private:
     import_ods& operator=(const import_ods&); // deleted
 
 public:
-    static void read_styles(const char* p, size_t n, spreadsheet::iface::import_styles* data);
+    static void read_styles(const char* p, size_t n, spreadsheet::iface::import_styles* data,
+		spreadsheet::iface::import_conditional_format* conditional_format = nullptr);
 };
 
 }
