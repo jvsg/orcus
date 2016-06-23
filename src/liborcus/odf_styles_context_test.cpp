@@ -49,7 +49,7 @@ void test_odf_fill(orcus::spreadsheet::import_styles &styles)
 
 void test_odf_border(orcus::spreadsheet::import_styles &styles)
 {
-    assert(styles.get_border_count() == 8);
+    assert(styles.get_border_count() == 9);
 
     /* Test that border style applies to all the sides when not specified */
     const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("Name1", &styles);
@@ -270,6 +270,18 @@ void test_odf_number_formatting(orcus::spreadsheet::import_styles& styles)
     assert(cell_number_format->format_string.str() == "[>=0]0.00;[RED]-0.00");
 
 }
+
+void test_odf_text_alignment(orcus::spreadsheet::import_styles& styles)
+{
+    const orcus::spreadsheet::cell_style_t* style = find_cell_style_by_name("Name22", &styles);
+    size_t xf = style->xf;
+    const orcus::spreadsheet::cell_format_t* cell_format = styles.get_cell_style_format(xf);
+    assert(cell_format);
+
+    assert(cell_format->hor_align == orcus::spreadsheet::hor_alignment_t::right);
+    assert(cell_format->ver_align == orcus::spreadsheet::ver_alignment_t::middle);
+
+}
 int main()
 {
     orcus::string_pool string_pool;
@@ -282,6 +294,7 @@ int main()
     test_odf_border(styles);
     test_odf_cell_protection(styles);
     test_odf_font(styles);
+    test_odf_text_alignment(styles);
 
     orcus::string_pool string_pool2;
     path = SRCDIR"/test/ods/styles/number-format.xml";
