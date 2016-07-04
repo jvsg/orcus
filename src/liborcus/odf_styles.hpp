@@ -107,6 +107,7 @@ struct number_formatting_style
     pstring character_stream;
 
     number_formatting_style():
+        number_formatting(0),
         is_volatile(false)
     {}
 
