@@ -79,6 +79,7 @@ number_formatting_style::number_formatting_style(const pstring& style_name, cons
 {
     name = style_name;
     is_volatile = volatile_style;
+    number_formatting = 0;
 }
 
 
